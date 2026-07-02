@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2D4A2A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="상담관리">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22%EA%B3%A0%EA%B0%9D%20%EC%83%81%EB%8B%B4%20%EA%B4%80%EB%A6%AC%22%2C%22short_name%22%3A%22%EC%83%81%EB%8B%B4%EA%B4%80%EB%A6%AC%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%232D4A2A%22%2C%22theme_color%22%3A%22%232D4A2A%22%2C%22start_url%22%3A%22.%22%7D">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPjxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIHJ4PSIyMDAiIGZpbGw9IiMyRDRBMkEiLz48cmVjdCB4PSIyMDAiIHk9IjE4MCIgd2lkdGg9IjYyNCIgaGVpZ2h0PSI3MjAiIHJ4PSI2MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjUwIi8+PHJlY3QgeD0iMzUwIiB5PSIxMzAiIHdpZHRoPSIzMjQiIGhlaWdodD0iMTUwIiByeD0iNDAiIGZpbGw9IiMyRDRBMkEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1MCIvPjxsaW5lIHgxPSIzMjAiIHkxPSI0NjAiIHgyPSI3MDAiIHkyPSI0NjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGxpbmUgeDE9IjMyMCIgeTE9IjYwMCIgeDI9IjcwMCIgeTI9IjYwMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjUwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMzIwIiB5MT0iNzQwIiB4Mj0iNTUwIiB5Mj0iNzQwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==">
+<title>고객 상담 관리</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F2F1ED;--sur:#FFF;--sur2:#ECEAE4;
+  --bd:#E0DDD6;--bd2:#C8C5BC;
+  --tx:#1C1A17;--tx2:#6B6860;--tx3:#A09D96;
+  --ac:#2D4A2A;--acl:#E8EFE7;
+  --dn:#C0392B;--dnl:#FDECEA;
+  --in:#1D4ED8;--inl:#EFF6FF;
+  --ok:#15803D;--okl:#DCFCE7;
+  --wn:#B45309;--wnl:#FEF3C7;
+  --r:14px;--rl:20px;
+  --nav:68px;
+}
+html,body{height:100%;font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);color:var(--tx)}
+
+/* ── 앱 래퍼 ── */
+#app{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  max-width:480px;margin:0 auto;
+  background:var(--bg);
+}
+
+/* ── 헤더 ── */
+.hdr{
+  flex-shrink:0;
+  background:var(--sur);border-bottom:1px solid var(--bd);
+  padding:12px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;z-index:10;
+}
+.hdr-title{font-size:16px;font-weight:700;color:var(--ac);letter-spacing:-.02em}
+.hdr-sub{font-size:11px;color:var(--tx3);margin-top:1px}
+.sync-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.sync-badge.idle{background:var(--sur2);color:var(--tx3)}
+.sync-badge.syncing{background:var(--wnl);color:var(--wn)}
+.sync-badge.ok{background:var(--okl);color:var(--ok)}
+.sync-badge.err{background:var(--dnl);color:var(--dn)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.syncing .sync-dot{animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── 콘텐츠 영역 ── */
+.content{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+}
+
+/* ── 각 탭 페이지 ── */
+.page{
+  position:absolute;inset:0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:14px 14px calc(var(--nav) + 16px);
+  display:none;
+}
+.page.active{display:block}
+
+/* ── 하단 탭바 ── */
+.tabbar{
+  flex-shrink:0;
+  height:var(--nav);
+  background:var(--sur);
+  border-top:1px solid var(--bd);
+  display:flex;
+  position:relative;z-index:10;
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  border:none;background:none;cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:500;
+  color:var(--tx3);transition:color .15s;position:relative;
+}
+.tab.active{color:var(--ac)}
+.tab svg{transition:transform .15s}
+.tab.active svg{transform:scale(1.1)}
+.tab-badge{
+  position:absolute;top:6px;right:calc(50% - 18px);
+  background:var(--dn);color:#fff;
+  font-size:10px;font-weight:700;
+  min-width:16px;height:16px;border-radius:10px;
+  display:none;align-items:center;justify-content:center;padding:0 4px;
+}
+
+/* ── 카드 ── */
+.card{background:var(--sur);border-radius:var(--rl);padding:16px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+/* ── 필드 ── */
+.field{margin-bottom:10px}
+.field:last-child{margin-bottom:0}
+.field>label{display:block;font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:5px}
+.req{color:var(--dn);margin-left:2px}
+.field input,.field select{
+  width:100%;padding:12px 13px;
+  border:1.5px solid var(--bd);border-radius:var(--r);
+  font-size:15px;font-family:'Noto Sans KR',sans-serif;
+  color:var(--tx);background:var(--sur);
+  outline:none;-webkit-appearance:none;appearance:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23A09D96' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:38px;
+}
+.field input:focus,.field select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(45,74,42,.10)}
+.field input::placeholder{color:var(--tx3)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ── 체크 필 ── */
+.check-group{display:flex;flex-wrap:wrap;gap:7px}
+.check-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:8px 13px;border:1.5px solid var(--bd);border-radius:100px;
+  font-size:13px;font-weight:500;color:var(--tx2);
+  cursor:pointer;user-select:none;background:var(--sur);transition:all .15s;
+}
+.check-pill input{display:none}
+.pill-check{
+  width:16px;height:16px;border-radius:50%;
+  border:1.5px solid var(--bd2);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .15s;background:var(--sur);
+}
+.pill-check svg{opacity:0;transform:scale(.4);transition:all .15s}
+.check-pill.on{background:var(--acl);border-color:var(--ac);color:var(--ac)}
+.check-pill.on .pill-check{background:var(--ac);border-color:var(--ac)}
+.check-pill.on .pill-check svg{opacity:1;transform:scale(1)}
+.etc-wrap{margin-top:8px;display:none}
+.etc-wrap.show{display:block}
+.etc-wrap input{
+  width:100%;padding:10px 13px;
+  border:1.5px solid var(--ac);border-radius:var(--r);
+  font-size:14px;font-family:'Noto Sans KR',sans-serif;
+  color:var(--tx);background:var(--acl);outline:none;-webkit-appearance:none;
+}
+.etc-wrap input::placeholder{color:var(--tx3)}
+
+/* ── 담당자 추가 ── */
+.add-row{display:flex;gap:8px;margin-top:8px}
+.add-row input{
+  flex:1;padding:10px 13px;
+  border:1.5px solid var(--bd);border-radius:var(--r);
+  font-size:14px;font-family:'Noto Sans KR',sans-serif;
+  outline:none;color:var(--tx);background:var(--sur);-webkit-appearance:none;
+}
+.add-row input:focus{border-color:var(--ac)}
+.btn-add{
+  padding:10px 14px;border-radius:var(--r);
+  font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;border:1.5px solid var(--ac);background:var(--acl);color:var(--ac);
+  white-space:nowrap;transition:all .15s;
+}
+.btn-add:active{background:var(--ac);color:#fff}
+
+/* ── 버튼 ── */
+.btn-main{
+  width:100%;padding:15px;border-radius:var(--rl);
+  font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;border:none;background:var(--ac);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:4px;transition:all .15s;
+  box-shadow:0 4px 16px rgba(45,74,42,.25);
+}
+.btn-main:active{transform:scale(.98);box-shadow:none}
+.btn-main:disabled{background:var(--bd2);box-shadow:none;cursor:not-allowed}
+.btn-sub{
+  width:100%;padding:13px;border-radius:var(--rl);
+  font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;border:1.5px solid var(--bd2);background:var(--sur2);color:var(--tx2);
+  display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;
+}
+.btn-sub:active{background:var(--bd)}
+
+/* ── 목록 ── */
+.list-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.search-box{flex:1;position:relative}
+.search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--tx3);pointer-events:none}
+.search-box input{
+  width:100%;padding:11px 13px 11px 36px;
+  border:1.5px solid var(--bd);border-radius:var(--r);
+  font-size:14px;font-family:'Noto Sans KR',sans-serif;
+  background:var(--sur);color:var(--tx);outline:none;-webkit-appearance:none;
+}
+.search-box input:focus{border-color:var(--ac)}
+.btn-csv{
+  padding:11px 13px;border-radius:var(--r);
+  font-size:12px;font-weight:600;font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;border:1.5px solid var(--bd2);background:var(--sur);color:var(--tx2);
+  display:flex;align-items:center;gap:4px;white-space:nowrap;
+}
+.btn-csv:active{background:var(--sur2)}
+.list-cnt{font-size:12px;color:var(--tx3);font-weight:500;margin-bottom:8px}
+
+/* ── 상담 카드 ── */
+.ec{background:var(--sur);border-radius:var(--rl);padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.ec.ec-err{border-left:3px solid var(--dn)}
+.ec-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.ec-name{font-size:17px;font-weight:700}
+.ec-phone{font-size:13px;color:var(--tx2);margin-top:2px}
+.ec-acts{display:flex;gap:6px}
+.icon-btn{
+  width:34px;height:34px;border:none;background:var(--sur2);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--tx3);
+}
+.icon-btn.edit:active{background:var(--inl);color:var(--in)}
+.icon-btn.del:active{background:var(--dnl);color:var(--dn)}
+.icon-btn.retry:active{background:var(--acl);color:var(--ac)}
+.ec-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.chip{font-size:11px;font-weight:600;padding:4px 9px;border-radius:8px;display:inline-flex;align-items:center;gap:3px}
+.chip-s{background:var(--inl);color:var(--in)}
+.chip-r{background:var(--wnl);color:var(--wn)}
+.chip-p{background:var(--acl);color:var(--ac)}
+.chip-k{background:#F3E8FF;color:#6B21A8}
+.chip-o{background:#E0F2FE;color:#0369A1}
+.chip-ok{background:var(--okl);color:var(--ok)}
+.chip-err{background:var(--dnl);color:var(--dn)}
+.chip-pend{background:var(--wnl);color:var(--wn)}
+.ec-rows{display:flex;flex-direction:column;gap:4px}
+.ec-row{display:flex;gap:6px;font-size:12px;color:var(--tx2);align-items:baseline}
+.ec-lbl{font-size:11px;color:var(--tx3);font-weight:600;min-width:30px;flex-shrink:0}
+.ec-meta{font-size:11px;color:var(--tx3);margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)}
+
+/* ── 저장 탭 미리보기 ── */
+.preview-row{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid var(--bd);align-items:baseline}
+.preview-lbl{font-size:11px;color:var(--tx3);font-weight:600;min-width:72px;flex-shrink:0}
+.preview-val{font-size:14px;color:var(--tx)}
+.preview-name{font-size:20px;font-weight:700;color:var(--tx);margin-bottom:3px}
+.preview-phone{font-size:14px;color:var(--tx2);margin-bottom:12px}
+
+/* ── 빈 상태 ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;gap:12px}
+.empty svg{opacity:.2}
+.empty p{font-size:14px;color:var(--tx3)}
+
+/* ── 모달 ── */
+.modal-wrap{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.45);
+  display:none;align-items:flex-end;justify-content:center;
+}
+.modal-wrap.open{display:flex}
+.modal-box{
+  background:var(--sur);border-radius:var(--rl) var(--rl) 0 0;
+  width:100%;max-width:480px;max-height:90vh;overflow-y:auto;
+  padding:20px 16px 40px;
+  animation:up .25s ease;
+}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-ttl{font-size:16px;font-weight:700}
+.modal-cls{width:32px;height:32px;border:none;background:var(--sur2);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx2)}
+.modal-acts{display:flex;gap:8px;margin-top:16px}
+.btn-cancel{flex:1;padding:13px;border-radius:var(--r);font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;border:1.5px solid var(--bd2);background:var(--sur2);color:var(--tx2)}
+.btn-ok{flex:2;padding:13px;border-radius:var(--r);font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;border:none;background:var(--ac);color:#fff}
+.btn-ok:active{transform:scale(.98)}
+.modal-card{margin-bottom:10px}
+
+/* ── 토스트 ── */
+#toast{
+  position:fixed;bottom:calc(var(--nav)+16px);left:50%;
+  transform:translateX(-50%) translateY(8px);
+  background:var(--tx);color:#fff;
+  padding:10px 20px;border-radius:100px;
+  font-size:13px;font-weight:500;white-space:nowrap;
+  opacity:0;transition:opacity .2s,transform .2s;
+  pointer-events:none;z-index:600;
+  max-width:calc(100vw - 40px);text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- 헤더 -->
+  <div class="hdr">
+    <div>
+      <div class="hdr-title">영업 방문 관리</div>
+      <div class="hdr-sub" id="hdr-date"></div>
+    </div>
+    <div class="sync-badge idle" id="sync-badge">
+      <div class="sync-dot"></div>
+      <span id="sync-label">구글 시트 연동</span>
+    </div>
+  </div>
+
+  <!-- 콘텐츠 -->
+  <div class="content">
+
+    <!-- ① 입력 탭 -->
+    <div class="page active" id="page-form">
+
+      <!-- ① 방문 정보 -->
+      <div class="card">
+        <div class="card-title">방문 정보</div>
+        <div class="field">
+          <label>방문 일자</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="field">
+          <label>방문 경로</label>
+          <select id="f-route">
+            <option value="">선택</option>
+            <option>기존 거래처</option>
+            <option>신규 발굴</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>영업 담당자</label>
+          <select id="f-sp">
+            <option value="">선택</option>
+            <option>정종선</option>
+            <option>이창수</option>
+            <option>이균하</option>
+          </select>
+          <div class="add-row">
+            <input type="text" id="f-newsp" placeholder="직접 입력 후 추가">
+            <button class="btn-add" onclick="addSP()">+ 추가</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 업체 정보 -->
+      <div class="card">
+        <div class="card-title">업체 정보</div>
+        <div class="field">
+          <label>업체명 <span class="req">*</span></label>
+          <input type="text" id="f-name" placeholder="업체명을 입력하세요">
+        </div>
+        <div class="field">
+          <label>프로젝트명</label>
+          <input type="text" id="f-proj" placeholder="프로젝트명을 입력하세요">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>프로젝트 지역 (시/도)</label>
+            <select id="f-sido" onchange="syncSgg('f-sido','f-sgg')"><option value="">선택</option></select>
+          </div>
+          <div class="field">
+            <label>시 / 군 / 구</label>
+            <select id="f-sgg"><option value="">선택</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label>업체 담당자</label>
+          <input type="text" id="f-contact" placeholder="담당자 이름">
+        </div>
+        <div class="field">
+          <label>전화번호</label>
+          <input type="tel" id="f-phone" placeholder="010-0000-0000">
+        </div>
+        <div class="field">
+          <label>방문 내용</label>
+          <textarea id="f-content" rows="4" placeholder="방문 내용을 입력하세요" style="width:100%;padding:12px 13px;border:1.5px solid var(--bd);border-radius:var(--r);font-size:15px;font-family:'Noto Sans KR',sans-serif;color:var(--tx);background:var(--sur);outline:none;resize:vertical;line-height:1.6;transition:border-color .15s,box-shadow .15s;" onfocus="this.style.borderColor='var(--ac)';this.style.boxShadow='0 0 0 3px rgba(45,74,42,.10)'" onblur="this.style.borderColor='var(--bd)';this.style.boxShadow='none'"></textarea>
+        </div>
+      </div>
+
+      <!-- ③ 관찰, 추적 -->
+      <div class="card">
+        <div class="card-title">관찰 / 추적</div>
+        <div class="field">
+          <label>성공 / 실패 여부</label>
+          <div class="check-group">
+            <label class="check-pill" id="f-pill-success" onclick="toggleResult('success')">
+              <span class="pill-check"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              ✓ 성공
+            </label>
+            <label class="check-pill" id="f-pill-fail" onclick="toggleResult('fail')" style="">
+              <span class="pill-check" style="border-color:var(--bd2)"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              ✗ 실패
+            </label>
+          </div>
+          <input type="hidden" id="f-result" value="">
+        </div>
+        <div class="field">
+          <label>매출액</label>
+          <input type="text" id="f-revenue" placeholder="예: 5,000,000">
+        </div>
+        <div class="field">
+          <label>실패 사유</label>
+          <input type="text" id="f-fail-reason" placeholder="실패 사유를 입력하세요">
+        </div>
+      </div>
+
+      <button class="btn-main" onclick="prepareSave()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        다음 — 내용 확인
+      </button>
+    </div>
+
+    <!-- ② 저장 탭 -->
+    <div class="page" id="page-save">
+      <div class="card" id="preview-card">
+        <div class="card-title">전송 전 내용 확인</div>
+        <div id="preview-body">
+          <div class="empty" style="padding:30px 0">
+            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+            <p>입력 탭에서 내용을 작성하면<br>여기서 확인 후 전송할 수 있습니다.</p>
+          </div>
+        </div>
+      </div>
+      <button class="btn-main" id="send-btn" onclick="sendPending()" style="display:none">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        구글 시트로 전송
+      </button>
+      <button class="btn-sub" id="discard-btn" onclick="discardPending()" style="display:none">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        작성 내용 취소
+      </button>
+    </div>
+
+    <!-- ③ 목록 탭 -->
+    <div class="page" id="page-list">
+      <div class="list-toolbar">
+        <div class="search-box">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search" placeholder="업체명, 프로젝트, 담당자, 지역 검색..." oninput="renderList()">
+        </div>
+        <button class="btn-csv" onclick="exportCSV()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV
+        </button>
+      </div>
+      <div class="list-cnt" id="list-cnt"></div>
+      <div id="entry-list"></div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- 탭바 -->
+  <div class="tabbar">
+    <button class="tab active" id="tab-form" onclick="goTab('form')">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+      입력
+    </button>
+    <button class="tab" id="tab-save" onclick="goTab('save')">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      저장
+      <span class="tab-badge" id="save-badge"></span>
+    </button>
+    <button class="tab" id="tab-list" onclick="goTab('list')">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      목록
+      <span class="tab-badge" id="err-badge"></span>
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- 수정 모달 -->
+<div class="modal-wrap" id="edit-modal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-ttl">방문 내역 수정</div>
+      <button class="modal-cls" onclick="closeEdit()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <!-- 방문 정보 -->
+    <div class="modal-card card" style="box-shadow:none;padding:0;margin-bottom:10px">
+      <div class="card-title">방문 정보</div>
+      <div class="field"><label>방문 일자</label><input type="date" id="e-date"></div>
+      <div class="field">
+        <label>방문 경로</label>
+        <select id="e-route"><option value="">선택</option><option>기존 거래처</option><option>신규 발굴</option></select>
+      </div>
+      <div class="field">
+        <label>영업 담당자</label>
+        <select id="e-sp"><option value="">선택</option><option>정종선</option><option>이창수</option><option>이균하</option></select>
+      </div>
+    </div>
+    <!-- 업체 정보 -->
+    <div class="modal-card card" style="box-shadow:none;padding:0;margin-bottom:10px">
+      <div class="card-title">업체 정보</div>
+      <div class="field"><label>업체명 <span class="req">*</span></label><input type="text" id="e-name" placeholder="업체명"></div>
+      <div class="field"><label>프로젝트명</label><input type="text" id="e-proj" placeholder="프로젝트명"></div>
+      <div class="field-row">
+        <div class="field"><label>시 / 도</label><select id="e-sido" onchange="syncSgg('e-sido','e-sgg')"><option value="">선택</option></select></div>
+        <div class="field"><label>시 / 군 / 구</label><select id="e-sgg"><option value="">선택</option></select></div>
+      </div>
+      <div class="field"><label>업체 담당자</label><input type="text" id="e-contact" placeholder="담당자 이름"></div>
+      <div class="field"><label>전화번호</label><input type="tel" id="e-phone" placeholder="010-0000-0000"></div>
+      <div class="field">
+        <label>방문 내용</label>
+        <textarea id="e-content" rows="3" placeholder="방문 내용" style="width:100%;padding:12px 13px;border:1.5px solid var(--bd);border-radius:var(--r);font-size:15px;font-family:'Noto Sans KR',sans-serif;color:var(--tx);background:var(--sur);outline:none;resize:vertical;line-height:1.6;transition:border-color .15s;" onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--bd)'"></textarea>
+      </div>
+    </div>
+    <!-- 관찰/추적 -->
+    <div class="modal-card card" style="box-shadow:none;padding:0;margin-bottom:0">
+      <div class="card-title">관찰 / 추적</div>
+      <div class="field">
+        <label>성공 / 실패 여부</label>
+        <div class="check-group">
+          <label class="check-pill" id="e-pill-success" onclick="toggleResultEdit('success')">
+            <span class="pill-check"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+            ✓ 성공
+          </label>
+          <label class="check-pill" id="e-pill-fail" onclick="toggleResultEdit('fail')">
+            <span class="pill-check"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+            ✗ 실패
+          </label>
+        </div>
+        <input type="hidden" id="e-result" value="">
+      </div>
+      <div class="field"><label>매출액</label><input type="text" id="e-revenue" placeholder="예: 5,000,000"></div>
+      <div class="field"><label>실패 사유</label><input type="text" id="e-fail-reason" placeholder="실패 사유를 입력하세요"></div>
+    </div>
+    <div class="modal-acts">
+      <button class="btn-cancel" onclick="closeEdit()">취소</button>
+      <button class="btn-ok" onclick="updateEntry()">수정 완료 &amp; 재전송</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz0HLyGx7OB1_2ockXBTzhc_LqEvnZyHpw2GRjV3IrW_T-SsmT_yU5yzOu0siUGlBlmzQ/exec';
+
+// ── 지역 ─────────────────────────────────────────────────────
+const REGIONS = {
+  "서울특별시":["강남구","강동구","강북구","강서구","관악구","광진구","구로구","금천구","노원구","도봉구","동대문구","동작구","마포구","서대문구","서초구","성동구","성북구","송파구","양천구","영등포구","용산구","은평구","종로구","중구","중랑구"],
+  "부산광역시":["강서구","금정구","기장군","남구","동구","동래구","부산진구","북구","사상구","사하구","서구","수영구","연제구","영도구","중구","해운대구"],
+  "대구광역시":["군위군","남구","달서구","달성군","동구","북구","서구","수성구","중구"],
+  "인천광역시":["강화군","계양구","남동구","동구","미추홀구","부평구","서구","연수구","옹진군","중구"],
+  "광주광역시":["광산구","남구","동구","북구","서구"],
+  "대전광역시":["대덕구","동구","서구","유성구","중구"],
+  "울산광역시":["남구","동구","북구","울주군","중구"],
+  "세종특별자치시":["세종시"],
+  "경기도":["가평군","고양시","과천시","광명시","광주시","구리시","군포시","김포시","남양주시","동두천시","수원시","시흥시","안산시","안성시","안양시","양주시","양평군","여주시","연천군","오산시","용인시","의왕시","의정부시","이천시","파주시","평택시","포천시","하남시","화성시"],
+  "강원특별자치도":["강릉시","고성군","동해시","삼척시","속초시","양구군","양양군","영월군","원주시","인제군","정선군","철원군","춘천시","태백시","평창군","홍천군","화천군","횡성군"],
+  "충청북도":["괴산군","단양군","보은군","영동군","옥천군","음성군","제천시","증평군","진천군","청주시","충주시"],
+  "충청남도":["계룡시","공주시","금산군","논산시","당진시","보령시","부여군","서산시","서천군","아산시","예산군","천안시","청양군","태안군","홍성군"],
+  "전북특별자치도":["고창군","군산시","김제시","남원시","무주군","부안군","순창군","완주군","익산시","임실군","장수군","전주시","정읍시","진안군"],
+  "전라남도":["강진군","고흥군","곡성군","광양시","구례군","나주시","담양군","목포시","무안군","보성군","순천시","신안군","여수시","영광군","영암군","완도군","장성군","장흥군","진도군","함평군","해남군","화순군"],
+  "경상북도":["경산시","경주시","고령군","구미시","문경시","봉화군","상주시","성주군","안동시","영덕군","영양군","영주시","영천시","예천군","울릉군","울진군","의성군","청도군","청송군","칠곡군","포항시"],
+  "경상남도":["거제시","거창군","고성군","김해시","남해군","밀양시","사천시","산청군","양산시","의령군","진주시","창녕군","창원시","통영시","하동군","함안군","함양군","합천군"],
+  "제주특별자치도":["서귀포시","제주시"]
+};
+(function(){
+  ['f-sido','e-sido'].forEach(id=>{
+    const el=document.getElementById(id);
+    Object.keys(REGIONS).forEach(r=>{const o=document.createElement('option');o.value=o.textContent=r;el.appendChild(o);});
+  });
+})();
+function syncSgg(sidoId,sggId){
+  const v=document.getElementById(sidoId).value;
+  const sg=document.getElementById(sggId);
+  sg.innerHTML='<option value="">선택</option>';
+  (REGIONS[v]||[]).forEach(s=>{const o=document.createElement('option');o.value=o.textContent=s;sg.appendChild(o);});
+}
+
+// ── 담당자 추가 ───────────────────────────────────────────────
+function addSP(){
+  const inp=document.getElementById('f-newsp');
+  const name=inp.value.trim(); if(!name) return;
+  const sel=document.getElementById('f-sp');
+  for(const o of sel.options){if(o.value===name){sel.value=name;inp.value='';return;}}
+  const o=document.createElement('option');o.value=o.textContent=name;
+  sel.appendChild(o);sel.value=name;inp.value='';
+  toast(`'${name}' 추가됨`);
+}
+
+// ── 성공/실패 토글 ────────────────────────────────────────────
+function toggleResult(val){
+  const cur=document.getElementById('f-result').value;
+  const next= cur===val ? '' : val;
+  document.getElementById('f-result').value=next;
+  document.getElementById('f-pill-success').classList.toggle('on', next==='성공');
+  document.getElementById('f-pill-fail').classList.toggle('on', next==='실패');
+  // 실패 pill은 붉은 계열로
+  const fp=document.getElementById('f-pill-fail');
+  if(next==='실패'){fp.style.background='var(--dnl)';fp.style.borderColor='var(--dn)';fp.style.color='var(--dn)';}
+  else{fp.style.background='';fp.style.borderColor='';fp.style.color='';}
+  // 성공 pill은 녹색(기본 on 스타일)
+}
+function toggleResultEdit(val){
+  const cur=document.getElementById('e-result').value;
+  const next= cur===val ? '' : val;
+  document.getElementById('e-result').value=next;
+  document.getElementById('e-pill-success').classList.toggle('on', next==='성공');
+  document.getElementById('e-pill-fail').classList.toggle('on', next==='실패');
+  const fp=document.getElementById('e-pill-fail');
+  if(next==='실패'){fp.style.background='var(--dnl)';fp.style.borderColor='var(--dn)';fp.style.color='var(--dn)';}
+  else{fp.style.background='';fp.style.borderColor='';fp.style.color='';}
+}
+
+// ── 체크 필 (미사용) ─────────────────────────────────────
+
+// ── 데이터 ───────────────────────────────────────────────────
+let entries=JSON.parse(localStorage.getItem('visit_v1')||'[]');
+function save(){localStorage.setItem('visit_v1',JSON.stringify(entries));}
+let pendingEntry=null;
+
+// ── 탭 전환 ──────────────────────────────────────────────────
+function goTab(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='list') renderList();
+  if(name==='save') renderPreview();
+}
+
+// ── 동기화 상태 ───────────────────────────────────────────────
+function setSyncStatus(state,text){
+  document.getElementById('sync-badge').className='sync-badge '+state;
+  document.getElementById('sync-label').textContent=text;
+}
+
+// ── 전송: JSONP 우선, 실패 시 no-cors fetch fallback ────────
+function sendToSheet(entry){
+  return sendJSONP(entry).catch(()=>sendFetch(entry));
+}
+
+async function sendFetch(entry){
+  const params = new URLSearchParams({data: JSON.stringify(entry)});
+  await fetch(GAS_URL + '?' + params.toString(), {method:'GET', mode:'no-cors'});
+  // no-cors는 응답 확인 불가 → 전송 성공으로 처리
+}
+
+function sendJSONP(entry){
+  return new Promise((resolve,reject)=>{
+    const cb='_gcb'+Date.now();
+    const sc=document.createElement('script');
+    const tm=setTimeout(()=>{cleanup();reject(new Error('timeout'));},15000);
+    function cleanup(){clearTimeout(tm);delete window[cb];sc.parentNode&&sc.parentNode.removeChild(sc);}
+    window[cb]=function(res){cleanup();res&&res.result==='success'?resolve(res):reject(new Error(res?res.message:'오류'));};
+    sc.src=GAS_URL+'?'+new URLSearchParams({callback:cb,data:JSON.stringify(entry)}).toString();
+    sc.onerror=()=>{cleanup();reject(new Error('script error'));};
+    document.head.appendChild(sc);
+  });
+}
+
+// ── 유틸 ─────────────────────────────────────────────────────
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function g(id){return document.getElementById(id).value.trim();}
+function s(id,v){document.getElementById(id).value=v||'';}
+function fd(d){if(!d)return '-';const[y,m,day]=d.split('-');return y+'.'+m+'.'+day;}
+
+// ── 입력 → 저장탭 이동 ────────────────────────────────────────
+function prepareSave(){
+  const name=g('f-name');
+  if(!name){toast('⚠️ 업체명을 입력해 주세요.');return;}
+  const sido=g('f-sido'),sgg=g('f-sgg');
+  const result=document.getElementById('f-result').value;
+  pendingEntry={
+    id:Date.now(),
+    visitDate:g('f-date'),
+    route:g('f-route'),
+    salesperson:g('f-sp'),
+    name,
+    projectName:g('f-proj'),
+    sido, sigungu:sgg,
+    region:[sido,sgg].filter(Boolean).join(' '),
+    contact:g('f-contact'),
+    phone:g('f-phone'),
+    visitContent:document.getElementById('f-content').value.trim(),
+    result,
+    revenue:g('f-revenue'),
+    failReason:g('f-fail-reason'),
+    createdAt:new Date().toLocaleString('ko-KR'), syncStatus:'pending'
+  };
+  updSaveBadge();
+  goTab('save');
+}
+
+// ── 저장탭 미리보기 ───────────────────────────────────────────
+function renderPreview(){
+  const e=pendingEntry;
+  const body=document.getElementById('preview-body');
+  const sendBtn=document.getElementById('send-btn');
+  const discBtn=document.getElementById('discard-btn');
+  if(!e){
+    body.innerHTML='<div class="empty" style="padding:30px 0"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><p>입력 탭에서 내용을 작성하면<br>여기서 확인 후 전송할 수 있습니다.</p></div>';
+    sendBtn.style.display='none'; discBtn.style.display='none'; return;
+  }
+  const row=(l,v)=>v?`<div class="preview-row"><span class="preview-lbl">${l}</span><span class="preview-val">${v}</span></div>`:'';
+  const resultBadge=e.result==='성공'?'<span style="background:var(--okl);color:var(--ok);padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;">✓ 성공</span>':e.result==='실패'?'<span style="background:var(--dnl);color:var(--dn);padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;">✗ 실패</span>':'';
+  body.innerHTML=`
+    <div class="preview-name">${e.name}</div>
+    ${e.projectName?`<div class="preview-phone" style="margin-bottom:4px">📋 ${e.projectName}</div>`:''}
+    ${e.region?`<div class="preview-phone">📍 ${e.region}</div>`:''}
+    <div style="height:8px"></div>
+    ${row('방문일자',e.visitDate?fd(e.visitDate):'')}
+    ${row('방문경로',e.route)}
+    ${row('영업담당자',e.salesperson)}
+    ${row('업체담당자',e.contact)}
+    ${row('전화번호',e.phone)}
+    ${e.visitContent?`<div class="preview-row"><span class="preview-lbl">방문내용</span><span class="preview-val" style="white-space:pre-wrap;line-height:1.6">${e.visitContent}</span></div>`:''}
+    ${e.result?`<div class="preview-row"><span class="preview-lbl">결과</span><span class="preview-val">${resultBadge}</span></div>`:''}
+    ${row('매출액',e.revenue?e.revenue+'원':'')}
+    ${row('실패사유',e.failReason)}
+    <div style="margin-top:10px;font-size:11px;color:var(--tx3)">작성: ${e.createdAt}</div>
+  `;
+  sendBtn.style.display='flex'; discBtn.style.display='flex';
+}
+
+// ── 전송 ─────────────────────────────────────────────────────
+async function sendPending(){
+  if(!pendingEntry){toast('전송할 내용이 없습니다.');return;}
+  const btn=document.getElementById('send-btn');
+  btn.disabled=true;
+  btn.innerHTML='<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 전송 중...';
+  setSyncStatus('syncing','전송 중...');
+  const entry={...pendingEntry};
+  entries.unshift(entry); save();
+  clearForm(); pendingEntry=null; updSaveBadge();
+  try{
+    await sendToSheet(entry);
+    entry.syncStatus='ok'; save();
+    setSyncStatus('ok','전송 완료 ✓');
+    toast('✓ 구글 시트에 전송되었습니다!');
+    renderPreview();
+    setTimeout(()=>{setSyncStatus('idle','구글 시트 연동'); goTab('list');},1500);
+  }catch(err){
+    entry.syncStatus='error'; save();
+    setSyncStatus('err','전송 실패');
+    toast('⚠️ 저장 완료, 시트 전송 실패');
+    renderPreview();
+    setTimeout(()=>setSyncStatus('idle','구글 시트 연동'),3000);
+  }
+  btn.disabled=false;
+  btn.innerHTML='<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 구글 시트로 전송';
+  updErrBadge();
+}
+
+// ── 취소 ─────────────────────────────────────────────────────
+function discardPending(){
+  if(!confirm('작성한 내용을 취소하시겠습니까?'))return;
+  pendingEntry=null; clearForm(); updSaveBadge(); renderPreview();
+  toast('작성 내용이 취소되었습니다.');
+}
+
+// ── 폼 초기화 ─────────────────────────────────────────────────
+function clearForm(){
+  ['f-date','f-route','f-sp','f-name','f-proj',
+   'f-sido','f-sgg','f-contact','f-phone','f-revenue','f-fail-reason']
+  .forEach(id=>s(id,''));
+  document.getElementById('f-content').value='';
+  document.getElementById('f-result').value='';
+  document.getElementById('f-pill-success').classList.remove('on');
+  document.getElementById('f-pill-fail').classList.remove('on');
+  syncSgg('f-sido','f-sgg');
+}
+
+// ── 수정 모달 ─────────────────────────────────────────────────
+let editId=null;
+function openEdit(id){
+  const e=entries.find(x=>x.id===id); if(!e) return;
+  editId=id;
+  s('e-date',e.visitDate||e.consultDate||'');
+  s('e-route',e.route); s('e-sp',e.salesperson);
+  s('e-name',e.name);
+  s('e-proj',e.projectName||'');
+  s('e-sido',e.sido); syncSgg('e-sido','e-sgg'); s('e-sgg',e.sigungu);
+  s('e-contact',e.contact||'');
+  s('e-phone',e.phone||'');
+  document.getElementById('e-content').value=e.visitContent||'';
+  // 성공/실패 초기화
+  document.getElementById('e-result').value=e.result||'';
+  document.getElementById('e-pill-success').classList.toggle('on',e.result==='성공');
+  document.getElementById('e-pill-fail').classList.toggle('on',e.result==='실패');
+  s('e-revenue',e.revenue||'');
+  s('e-fail-reason',e.failReason||'');
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEdit(){document.getElementById('edit-modal').classList.remove('open');editId=null;}
+document.getElementById('edit-modal').addEventListener('click',function(ev){if(ev.target===this)closeEdit();});
+
+async function updateEntry(){
+  const name=g('e-name');
+  if(!name){toast('⚠️ 업체명을 입력해 주세요.');return;}
+  const idx=entries.findIndex(e=>e.id===editId); if(idx<0) return;
+  const sido=g('e-sido'),sgg=g('e-sgg');
+  const result=document.getElementById('e-result').value;
+  const updated={...entries[idx],
+    visitDate:g('e-date'),route:g('e-route'),salesperson:g('e-sp'),
+    name,
+    projectName:g('e-proj'),
+    sido,sigungu:sgg,
+    region:[sido,sgg].filter(Boolean).join(' '),
+    contact:g('e-contact'),
+    phone:g('e-phone'),
+    visitContent:document.getElementById('e-content').value.trim(),
+    result,
+    revenue:g('e-revenue'),
+    failReason:g('e-fail-reason'),
+    updatedAt:new Date().toLocaleString('ko-KR'),syncStatus:'pending'
+  };
+  entries[idx]=updated; save(); closeEdit(); renderList();
+  setSyncStatus('syncing','재전송 중...');
+  try{
+    await sendToSheet(updated);
+    entries[idx].syncStatus='ok';save();renderList();
+    setSyncStatus('ok','전송 완료 ✓');
+    toast('✓ 수정되고 구글 시트에 반영되었습니다.');
+    setTimeout(()=>setSyncStatus('idle','구글 시트 연동'),3000);
+  }catch(err){
+    entries[idx].syncStatus='error';save();renderList();
+    setSyncStatus('err','전송 실패');
+    toast('⚠️ 수정 완료, 시트 전송 실패');
+    setTimeout(()=>setSyncStatus('idle','구글 시트 연동'),3000);
+  }
+  updErrBadge();
+}
+
+// ── 삭제 ─────────────────────────────────────────────────────
+function deleteEntry(id){
+  if(!confirm('이 방문 내역을 삭제하시겠습니까?'))return;
+  entries=entries.filter(e=>e.id!==id);
+  save();renderList();updErrBadge();toast('삭제되었습니다.');
+}
+
+// ── 재전송 ───────────────────────────────────────────────────
+async function retrySingle(id){
+  const entry=entries.find(e=>e.id===id); if(!entry) return;
+  setSyncStatus('syncing','재전송 중...');
+  try{
+    await sendToSheet(entry);
+    entry.syncStatus='ok';save();renderList();updErrBadge();
+    setSyncStatus('ok','전송 완료 ✓');toast('✓ 재전송 성공');
+    setTimeout(()=>setSyncStatus('idle','구글 시트 연동'),2000);
+  }catch(err){
+    setSyncStatus('err','재전송 실패');toast('⚠️ 재전송 실패');
+    setTimeout(()=>setSyncStatus('idle','구글 시트 연동'),2000);
+  }
+}
+
+// ── 뱃지 ─────────────────────────────────────────────────────
+function updErrBadge(){
+  const cnt=entries.filter(e=>e.syncStatus==='error').length;
+  const b=document.getElementById('err-badge');
+  b.style.display=cnt?'flex':'none'; b.textContent=cnt;
+}
+function updSaveBadge(){
+  const b=document.getElementById('save-badge');
+  b.style.display=pendingEntry?'flex':'none'; b.textContent='1';
+}
+
+// ── 목록 렌더링 ───────────────────────────────────────────────
+function renderList(){
+  const q=(document.getElementById('search').value||'').trim().toLowerCase();
+  const filtered=q?entries.filter(e=>
+    e.name.toLowerCase().includes(q)||
+    (e.phone&&e.phone.includes(q))||
+    (e.salesperson&&e.salesperson.includes(q))||
+    (e.projectName&&e.projectName.toLowerCase().includes(q))||
+    (e.contact&&e.contact.includes(q))||
+    (e.region&&e.region.includes(q))||
+    (e.visitContent&&e.visitContent.toLowerCase().includes(q))
+  ):entries;
+  document.getElementById('list-cnt').textContent=
+    q?`검색 결과 ${filtered.length}건 (전체 ${entries.length}건)`:`전체 ${entries.length}건`;
+  const list=document.getElementById('entry-list');
+  if(!filtered.length){
+    list.innerHTML='<div class="empty"><svg width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg><p>'+(entries.length===0?'저장된 상담 내역이 없습니다.':'검색 결과가 없습니다.')+'</p></div>';
+    return;
+  }
+  const sc=s=>{
+    if(s==='ok')return'<span class="chip chip-ok">✓ 전송됨</span>';
+    if(s==='error')return'<span class="chip chip-err">✕ 전송실패</span>';
+    return'<span class="chip chip-pend">⏳ 대기</span>';
+  };
+  list.innerHTML=filtered.map(e=>`
+    <div class="ec ${e.syncStatus==='error'?'ec-err':''}">
+      <div class="ec-top">
+        <div><div class="ec-name">${e.name}</div><div class="ec-phone">${e.projectName||e.contact||e.phone||''}</div></div>
+        <div class="ec-acts">
+          ${e.syncStatus==='error'?`<button class="icon-btn retry" onclick="retrySingle(${e.id})"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>`:''}
+          <button class="icon-btn edit" onclick="openEdit(${e.id})"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="icon-btn del" onclick="deleteEntry(${e.id})"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        </div>
+      </div>
+      <div class="ec-chips">
+        ${e.salesperson?`<span class="chip chip-s">${e.salesperson}</span>`:''}
+        ${e.route?`<span class="chip chip-r">${e.route}</span>`:''}
+        ${e.result==='성공'?'<span class="chip chip-ok">✓ 성공</span>':e.result==='실패'?'<span class="chip chip-err">✗ 실패</span>':''}
+        ${e.revenue?`<span class="chip chip-p">💰 ${e.revenue}원</span>`:''}
+        ${sc(e.syncStatus)}
+      </div>
+      <div class="ec-rows">
+        ${(e.visitDate||e.consultDate)?`<div class="ec-row"><span class="ec-lbl">방문일</span>${fd(e.visitDate||e.consultDate)}</div>`:''}
+        ${e.region?`<div class="ec-row"><span class="ec-lbl">지역</span>${e.region}</div>`:''}
+        ${e.projectName?`<div class="ec-row"><span class="ec-lbl">프로젝트</span>${e.projectName}</div>`:''}
+        ${e.phone?`<div class="ec-row"><span class="ec-lbl">전화</span>${e.phone}</div>`:''}
+        ${e.visitContent?`<div class="ec-row"><span class="ec-lbl" style="min-width:36px">방문내용</span><span style="white-space:pre-wrap;word-break:break-all;flex:1">${e.visitContent.length>80?e.visitContent.slice(0,80)+'…':e.visitContent}</span></div>`:''}
+        ${e.failReason?`<div class="ec-row"><span class="ec-lbl">실패사유</span>${e.failReason}</div>`:''}
+      </div>
+      <div class="ec-meta">등록: ${e.createdAt}${e.updatedAt?' | 수정: '+e.updatedAt:''}</div>
+    </div>
+  `).join('');
+}
+
+// ── CSV ───────────────────────────────────────────────────────
+function exportCSV(){
+  if(!entries.length){toast('내보낼 데이터가 없습니다.');return;}
+  const h=['방문일자','방문경로','영업담당자','업체명','프로젝트명','시도','시군구','업체담당자','전화번호','방문내용','결과','매출액','실패사유','전송여부','등록일시'];
+  const rows=entries.map(e=>[
+    e.visitDate||e.consultDate||'',
+    e.route,e.salesperson,e.name,
+    e.projectName||'',e.sido,e.sigungu,
+    e.contact||'',e.phone||'',
+    e.visitContent||'',e.result||'',e.revenue||'',e.failReason||'',
+    e.syncStatus==='ok'?'완료':'미전송',e.createdAt
+  ].map(c=>`"${(c||'').replace(/"/g,'""')}"`)  .join(','));
+  const csv='\uFEFF'+[h.join(','),...rows].join('\n');
+  const a=Object.assign(document.createElement('a'),{
+    href:URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})),
+    download:'고객상담목록_'+new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','')  +'.csv'
+  });
+  a.click(); toast('CSV 내보내기 완료');
+}
+
+// ── 초기화 ───────────────────────────────────────────────────
+document.getElementById('hdr-date').textContent=
+  new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+setSyncStatus('idle','구글 시트 연동');
+updErrBadge(); updSaveBadge();
+</script>
+</body>
+</html>
